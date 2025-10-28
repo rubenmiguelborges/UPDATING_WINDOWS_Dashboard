@@ -98,7 +98,8 @@ function updateAnomalies(anomalies) {
     const container = document.getElementById('anomalies-container');
     if (!container) return;
 
-    if (!anomalies || anomalies.length === 0) {
+    // Handle null, undefined, or empty arrays
+    if (!anomalies || !Array.isArray(anomalies) || anomalies.length === 0) {
         container.innerHTML = '<div class="no-anomalies">No anomalies detected</div>';
         return;
     }

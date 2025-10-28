@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Update Monitor</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1>Windows Update Monitor</h1>
+                <span class="subtitle">Real-time System Analytics</span>
+            </div>
+            <div class="header-right">
+                <div class="clock">
+                    <span id="current-time">--:--:--</span>
+                </div>
+                <div class="uptime">
+                    <label>Session:</label>
+                    <span id="session-uptime">00:00:00</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- VPN Warning Banner -->
+        <div id="vpn-warning" class="vpn-warning" style="display: none;">
+            <div class="vpn-icon">⚠️</div>
+            <div class="vpn-content">
+                <strong>VPN Connection Detected</strong>
+                <p id="vpn-message">Network metrics may be affected</p>
+                <small>Adapters: <span id="vpn-adapters"></span></small>
+            </div>
+        </div>
+
+        <!-- Current Phase Badge -->
+        <div class="phase-section">
+            <h2>Current Phase</h2>
+            <div id="current-phase" class="status-badge status-idle">Idle (0s)</div>
+            <div class="phase-info">
+                <span>Confidence: <span id="phase-confidence">--</span></span>
+            </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+            <!-- CPU Metric -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h3>CPU Usage</h3>
+                    <span id="cpu-value" class="metric-value">0.0%</span>
+                </div>
+                <div class="metric-bar-container">
+                    <div id="cpu-bar" class="metric-bar"></div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="cpu-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Memory Metric -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h3>Memory Usage</h3>
+                    <span id="mem-value" class="metric-value">0.0%</span>
+                </div>
+                <div class="metric-bar-container">
+                    <div id="mem-bar" class="metric-bar"></div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="mem-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Disk Queue Metric -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h3>Disk Queue Length</h3>
+                    <span id="disk-value" class="metric-value">0.0</span>
+                </div>
+                <div class="metric-bar-container">
+                    <div id="disk-bar" class="metric-bar"></div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="disk-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Network Metric -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h3>Network Total</h3>
+                    <span id="net-value" class="metric-value">0.00 MB/s</span>
+                </div>
+                <div class="metric-bar-container">
+                    <div id="net-bar" class="metric-bar"></div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="net-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Anomalies Section -->
+        <div class="anomalies-section">
+            <h2>Anomalies & Alerts</h2>
+            <div id="anomalies-container" class="anomalies-container">
+                <div class="no-anomalies">No anomalies detected</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Monitoring live.json from %TEMP%\WinUpdateMonState\</p>
+            <p>Phase 1 MVP - Real-time Metrics Dashboard</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <script src="js/dataLoader.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/phaseDetector.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

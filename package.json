@@ -1,0 +1,35 @@
+{
+  "name": "windows-update-monitor",
+  "version": "1.0.0",
+  "description": "Electron-based desktop application for monitoring Windows Update processes in real-time",
+  "main": "electron/main.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:40392/git/rubenmiguelborges/UPDATING_WINDOWS_Dashboard"
+  },
+  "keywords": ["windows", "update", "monitor", "electron", "dashboard"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "chokidar": "^4.0.3",
+    "date-fns": "^4.1.0",
+    "electron": "^39.0.0",
+    "electron-store": "^11.0.2"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.1",
+    "electron-builder": "^26.0.12"
+  }
+}

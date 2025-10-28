@@ -185,13 +185,13 @@ function Test-VPNConnection {
 
     try {
         $vpnAdapters = Get-NetAdapter -ErrorAction Stop | Where-Object {
-            # Match VPN/Virtual adapters
+            # Exclude WSL and Hyper-V management adapters first
+            $isWSL = $_.Name -match 'WSL|Hyper-V|vEthernet.*WSL' -or
+                     $_.InterfaceDescription -match 'Hyper-V|WSL'
+
+            # Match VPN/Virtual adapters (but only if not already excluded)
             $isVirtual = $_.InterfaceDescription -match 'VPN|TAP|Tunnel' -or
                          ($_.Name -match 'VPN|TAP|Tunnel')
-
-            # Exclude WSL and Hyper-V management adapters
-            $isWSL = $_.Name -match 'WSL|Hyper-V' -or
-                     $_.InterfaceDescription -match 'Hyper-V|WSL'
 
             # Include if it's virtual but not WSL, and it's up
             $isVirtual -and -not $isWSL -and $_.Status -eq 'Up'

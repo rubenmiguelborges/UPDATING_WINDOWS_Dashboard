@@ -1,50 +1,32 @@
 const { contextBridge, ipcRenderer } = require('electron');
-const fs = require('fs').promises;
-const path = require('path');
-const os = require('os');
 
+// Expose safe APIs to the renderer process via IPC
 contextBridge.exposeInMainWorld('electronAPI', {
     // Read live.json file
     readLiveData: async () => {
-        const liveJsonPath = path.join(os.tmpdir(), 'WinUpdateMonState', 'live.json');
-        try {
-            const data = await fs.readFile(liveJsonPath, 'utf8');
-            return JSON.parse(data);
-        } catch (error) {
-            console.warn('Failed to read live.json:', error.message);
-            return null;
-        }
+        return await ipcRenderer.invoke('read-live-data');
     },
 
     // Watch file changes
     watchFile: (filePath, callback) => {
-        const chokidar = require('chokidar');
-        const watcher = chokidar.watch(filePath, {
-            persistent: true,
-            awaitWriteFinish: { stabilityThreshold: 100 }
-        });
+        ipcRenderer.on('file-changed', () => callback());
+        ipcRenderer.send('watch-file', filePath);
 
-        watcher.on('change', () => callback());
-        watcher.on('error', (error) => console.error('Watcher error:', error));
-
-        return () => watcher.close();
+        return () => {
+            ipcRenderer.send('unwatch-file', filePath);
+        };
     },
 
     // Read historical CSV
     readHistoricalData: async (dirPath, fileName) => {
-        try {
-            const filePath = path.join(dirPath, fileName);
-            const data = await fs.readFile(filePath, 'utf8');
-            return data;
-        } catch (error) {
-            console.warn('Failed to read historical data:', error.message);
-            return null;
-        }
+        return await ipcRenderer.invoke('read-historical-data', dirPath, fileName);
     },
 
     // Get platform information
     getPlatform: () => process.platform,
 
     // Get temp directory
-    getTempDir: () => os.tmpdir()
+    getTempDir: () => {
+        return process.platform === 'win32' ? process.env.TEMP : '/tmp';
+    }
 });

@@ -1,8 +1,12 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs').promises;
+const os = require('os');
+const chokidar = require('chokidar');
 
 let mainWindow;
 let tray;
+let fileWatcher = null;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -62,6 +66,54 @@ function createTray() {
         mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
     });
 }
+
+// IPC handler for reading live data
+ipcMain.handle('read-live-data', async () => {
+    const liveJsonPath = path.join(os.tmpdir(), 'WinUpdateMonState', 'live.json');
+    try {
+        const data = await fs.readFile(liveJsonPath, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.warn('Failed to read live.json:', error.message);
+        return null;
+    }
+});
+
+// IPC handler for watching file
+ipcMain.on('watch-file', (event, filePath) => {
+    if (fileWatcher) {
+        fileWatcher.close();
+    }
+
+    fileWatcher = chokidar.watch(filePath, {
+        persistent: true,
+        awaitWriteFinish: { stabilityThreshold: 100 }
+    });
+
+    fileWatcher.on('change', () => {
+        event.sender.send('file-changed');
+    });
+});
+
+// IPC handler for unwatching file
+ipcMain.on('unwatch-file', () => {
+    if (fileWatcher) {
+        fileWatcher.close();
+        fileWatcher = null;
+    }
+});
+
+// IPC handler for reading historical data
+ipcMain.handle('read-historical-data', async (event, dirPath, fileName) => {
+    try {
+        const filePath = path.join(dirPath, fileName);
+        const data = await fs.readFile(filePath, 'utf8');
+        return data;
+    } catch (error) {
+        console.warn('Failed to read historical data:', error.message);
+        return null;
+    }
+});
 
 app.whenReady().then(() => {
     createWindow();

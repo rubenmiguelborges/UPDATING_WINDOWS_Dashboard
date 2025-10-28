@@ -24,6 +24,9 @@ async function initialize() {
     // Update clock
     setInterval(updateClock, 1000);
 
+    // Setup speedup button
+    setupSpeedupButton();
+
     console.log('Dashboard initialized successfully');
 }
 
@@ -148,6 +151,48 @@ function updateClock() {
         uptimeEl.textContent =
             `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
+}
+
+function setupSpeedupButton() {
+    const speedupBtn = document.getElementById('speedup-btn');
+    const statusDiv = document.getElementById('speedup-status');
+
+    if (!speedupBtn) return;
+
+    speedupBtn.addEventListener('click', async () => {
+        speedupBtn.disabled = true;
+        speedupBtn.textContent = '⏳ Optimizing...';
+
+        statusDiv.style.display = 'block';
+        statusDiv.className = 'speedup-status info';
+        statusDiv.textContent = 'Running Windows Update optimization commands...';
+
+        try {
+            const result = await window.electronAPI.speedupUpdates();
+
+            if (result.success) {
+                statusDiv.className = 'speedup-status success';
+                statusDiv.textContent = `✓ ${result.message}`;
+            } else {
+                statusDiv.className = 'speedup-status error';
+                statusDiv.textContent = `✗ ${result.message}`;
+            }
+        } catch (error) {
+            statusDiv.className = 'speedup-status error';
+            statusDiv.textContent = `✗ Error: ${error.message}`;
+        }
+
+        // Re-enable button after 10 seconds
+        setTimeout(() => {
+            speedupBtn.disabled = false;
+            speedupBtn.textContent = '⚡ Speed Up Updates';
+        }, 10000);
+
+        // Hide status after 15 seconds
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 15000);
+    });
 }
 
 // Initialize on load

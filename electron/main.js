@@ -115,6 +115,40 @@ ipcMain.handle('read-historical-data', async (event, dirPath, fileName) => {
     }
 });
 
+// IPC handler for speedup updates
+ipcMain.handle('speedup-updates', async () => {
+    const { exec } = require('child_process');
+    const { promisify } = require('util');
+    const execAsync = promisify(exec);
+
+    try {
+        // PowerShell commands to optimize Windows Update
+        const commands = [
+            'Stop-Service -Name wuauserv -Force -ErrorAction SilentlyContinue',
+            'Stop-Service -Name bits -Force -ErrorAction SilentlyContinue',
+            'Remove-Item -Path "$env:SystemRoot\\SoftwareDistribution\\Download\\*" -Recurse -Force -ErrorAction SilentlyContinue',
+            'Start-Service -Name bits',
+            'Start-Service -Name wuauserv',
+            'wuauclt /detectnow /updatenow'
+        ].join('; ');
+
+        const psCommand = `powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "${commands}"`;
+
+        await execAsync(psCommand, { timeout: 30000 });
+
+        return {
+            success: true,
+            message: 'Windows Update services optimized successfully! Updates will resume shortly.'
+        };
+    } catch (error) {
+        console.error('Speedup failed:', error);
+        return {
+            success: false,
+            message: `Optimization failed: ${error.message}. Try running as Administrator.`
+        };
+    }
+});
+
 app.whenReady().then(() => {
     createWindow();
     createTray();

@@ -37,11 +37,17 @@
 
         <!-- Current Phase Badge -->
         <div class="phase-section">
-            <h2>Current Phase</h2>
+            <div class="phase-header">
+                <h2>Current Phase</h2>
+                <button id="speedup-btn" class="speedup-button" title="Optimize Windows Update performance">
+                    ⚡ Speed Up Updates
+                </button>
+            </div>
             <div id="current-phase" class="status-badge status-idle">Idle (0s)</div>
             <div class="phase-info">
                 <span>Confidence: <span id="phase-confidence">--</span></span>
             </div>
+            <div id="speedup-status" class="speedup-status" style="display: none;"></div>
         </div>
 
         <!-- Metrics Grid -->

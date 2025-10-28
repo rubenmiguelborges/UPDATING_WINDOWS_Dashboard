@@ -28,5 +28,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Get temp directory
     getTempDir: () => {
         return process.platform === 'win32' ? process.env.TEMP : '/tmp';
+    },
+
+    // Speed up Windows Updates
+    speedupUpdates: async () => {
+        return await ipcRenderer.invoke('speedup-updates');
     }
 });
